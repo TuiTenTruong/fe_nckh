@@ -1,0 +1,192 @@
+# ============================================================================
+# Flutter & Dart
+# ============================================================================
+# Avoid committing pubspec.lock for library packages; see
+# https://dart.dev/guides/libraries/private-files
+pubspec.lock
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.fvm/flutter_sdk
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# ============================================================================
+# Symbolication & Obfuscation
+# ============================================================================
+app.*.symbols
+app.*.map.json
+
+# ============================================================================
+# Build artifacts and cache
+# ============================================================================
+*.o
+*.a
+*.so
+*.dylib
+/build/
+/.dart_tool/
+/lib/generated_plugin_registrant.dart
+*.class
+.gradle
+*.jar
+*.aar
+
+# ============================================================================
+# IDE
+# ============================================================================
+# IntelliJ/AndroidStudio related
+*.iml
+*.ipr
+*.iws
+.idea/
+*.swp
+*.swo
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# GEdit
+*~
+.gedit*
+
+# Atom
+.atom/
+
+# Vim
+.vim/
+*.swp
+*.swo
+*~
+
+# ============================================================================
+# OS-specific
+# ============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# ============================================================================
+# Development tools & misc
+# ============================================================================
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+.log
+*.log
+*.pyc
+.env
+.env.local
+.env.*.local
+
+# ============================================================================
+# Android-specific
+# ============================================================================
+android/app/debug
+android/app/profile
+android/app/release
+android/key.properties
+android/local.properties
+.gradle/
+*.jks
+*.keystore
+gradle-wrapper.jar
+
+# ============================================================================
+# iOS-specific
+# ============================================================================
+ios/Flutter/ephemeral/
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/GeneratedPluginRegistrant.swift
+Pods/
+Podfile.lock
+*.xcarchive
+*.xcworkspace/xcuserdata/
+ios/.symlinks/
+ios/*.mode1v3
+ios/*.mode2v3
+ios/*.moved-aside
+ios/*.pbxuser
+ios/*.perspectivev3
+ios/**/xcshareddata/WorkspaceSettings.xcsettings
+ios/Runner/GeneratedPluginRegistrant.*
+
+# ============================================================================
+# macOS-specific
+# ============================================================================
+macos/Flutter/ephemeral/
+macos/Flutter/flutter_export_environment.sh
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Podfile.lock
+
+# ============================================================================
+# web & web-related
+# ============================================================================
+web/flutter_service_worker.js
+
+# ============================================================================
+# Windows-specific
+# ============================================================================
+windows/flutter/ephemeral/
+windows/runner/GeneratedPluginRegistrant.cc
+windows/runner/GeneratedPluginRegistrant.h
+windows/runner/flutter/generated_plugin_registrant.cc
+windows/runner/flutter/generated_plugin_registrant.h
+
+# ============================================================================
+# Linux-specific
+# ============================================================================
+linux/flutter/ephemeral/
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+
+# ============================================================================
+# Secrets & sensitive files
+# ============================================================================
+.env*
+!.env.example
+**/secret*
+**/api_key*
+**/private*
+credentials.json
+service-account.json
+
+# ============================================================================
+# Package manager
+# ============================================================================
+.pub_cache
+.packages
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# ============================================================================
+# Analysis
+# ============================================================================
+coverage/
+.coverage
+
