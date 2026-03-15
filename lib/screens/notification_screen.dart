@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/widgets.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -11,7 +12,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifications')),
+      appBar: const AppHeaderBar(
+        title: 'Notifications',
+        subtitle: 'Cap nhat thong bao moi nhat',
+      ),
       body: const Center(child: Text('Notification Screen')),
     );
   }
