@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/widgets.dart';
 
 class NotificationScreen extends StatefulWidget {
-  const NotificationScreen({Key? key}) : super(key: key);
+  const NotificationScreen({super.key});
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -14,7 +14,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       appBar: const AppHeaderBar(
         title: 'Notifications',
-        subtitle: 'Cap nhat thong bao moi nhat',
+        subtitle: 'Cập nhật thông báo mới nhất',
       ),
       body: const Center(child: Text('Notification Screen')),
     );

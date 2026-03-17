@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'chat_screen.dart';
+
 class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({Key? key}) : super(key: key);
+  const FavoritesScreen({super.key});
 
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();
@@ -10,6 +12,6 @@ class FavoritesScreen extends StatefulWidget {
 class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Favorites Screen'));
+    return const ChatScreen();
   }
 }

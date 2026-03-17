@@ -17,75 +17,146 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
       'https://storage.googleapis.com/codeless-app.appspot.com/uploads%2Fimages%2F0SN4w0RadPKtOcjLJ2JJ%2F987e5450-06fb-4362-9a06-e76dbbaf738c.png';
 
   @override
-  Size get preferredSize => const Size.fromHeight(132);
+  Size get preferredSize => const Size.fromHeight(148);
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xFF23C35B),
+            Color(0xFF119E4B),
+            Color(0xFF0E8F42),
+          ],
+          stops: <double>[0.0, 0.55, 1.0],
+        ),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: preferredSize.height,
+        child: Stack(
+          children: <Widget>[
+            const Positioned(
+              right: -26,
+              top: -24,
+              child: _GlowBubble(size: 112, opacity: 0.16),
+            ),
+            const Positioned(
+              left: -38,
+              bottom: -54,
+              child: _GlowBubble(size: 156, opacity: 0.11),
+            ),
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(0x26FFFFFF),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: const Color(0x40FFFFFF),
+                              width: 0.7,
+                            ),
+                          ),
+                          child: Center(
+                            child: Image.network(
+                              leadingIconUrl ?? _defaultLeadingIconUrl,
+                              width: 16,
+                              height: 16,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 23,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                              height: 1.15,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0x26FFFFFF),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: const Color(0x40FFFFFF),
+                              width: 0.7,
+                            ),
+                          ),
+                          child: Text(
+                            'AI',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xE6FFFFFF),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        height: 1.42,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GlowBubble extends StatelessWidget {
+  const _GlowBubble({required this.size, required this.opacity});
+
+  final double size;
+  final double opacity;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: preferredSize.height,
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
-        gradient: LinearGradient(
-          colors: <Color>[Color(0xFF22C55E), Color(0xFF00A63E)],
-        ),
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: <Widget>[
-          Positioned(
-            left: 24,
-            top: 24,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0x33FFFFFF),
-                borderRadius: BorderRadius.circular(9999),
-              ),
-              child: Center(
-                child: Image.network(
-                  leadingIconUrl ?? _defaultLeadingIconUrl,
-                  width: 12,
-                  height: 12,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 27,
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                height: 1.5,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 24,
-            right: 24,
-            top: 80,
-            child: Opacity(
-              opacity: 0.9,
-              child: Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 14,
-                  height: 1.4,
-                ),
-              ),
-            ),
-          ),
-        ],
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: opacity),
+        shape: BoxShape.circle,
       ),
     );
   }

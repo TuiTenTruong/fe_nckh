@@ -11,6 +11,10 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String detail = '/detail';
+  static const String detailRecipeBase = '/detail-recipe';
+  static const String detailRecipe = '/detail-recipe/:recipeId';
+  static const String detailStepBase = '/detail-step';
+  static const String detailStep = '/detail-step/:recipeId';
   static const String notification = '/notification';
 
   static final GoRouter router = GoRouter(
@@ -29,18 +33,49 @@ class AppRoutes {
           );
         },
         routes: <RouteBase>[
-          GoRoute(path: home, builder: (_, __) => const HomeScreen()),
-          GoRoute(path: search, builder: (_, __) => const SearchScreen()),
-          GoRoute(path: recipe, builder: (_, __) => const RecipeScreen()),
-          GoRoute(path: favorites, builder: (_, __) => const FavoritesScreen()),
-          GoRoute(path: profile, builder: (_, __) => const ProfileScreen()),
+          GoRoute(path: home, builder: (context, state) => const HomeScreen()),
+          GoRoute(
+            path: search,
+            builder: (context, state) => const SearchScreen(),
+          ),
+          GoRoute(
+            path: recipe,
+            builder: (context, state) => const RecipeScreen(),
+          ),
+          GoRoute(
+            path: favorites,
+            builder: (context, state) => const FavoritesScreen(),
+          ),
+          GoRoute(
+            path: profile,
+            builder: (context, state) => const ProfileScreen(),
+          ),
         ],
       ),
-      GoRoute(path: settings, builder: (_, __) => const SettingsScreen()),
-      GoRoute(path: detail, builder: (_, __) => const DetailScreen()),
+      GoRoute(
+        path: settings,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(path: detail, builder: (context, state) => const DetailScreen()),
+      GoRoute(
+        path: detailRecipe,
+        builder: (context, GoRouterState state) {
+          final String recipeId = state.pathParameters['recipeId'] ?? '';
+          return DetailRecipeScreen(recipeId: recipeId);
+        },
+      ),
+      GoRoute(
+        path: detailStep,
+        builder: (context, GoRouterState state) {
+          final String recipeId = state.pathParameters['recipeId'] ?? '';
+          final int initialStep =
+              int.tryParse(state.uri.queryParameters['step'] ?? '0') ?? 0;
+          return DetailStepScreen(recipeId: recipeId, initialStep: initialStep);
+        },
+      ),
       GoRoute(
         path: notification,
-        builder: (_, __) => const NotificationScreen(),
+        builder: (context, state) => const NotificationScreen(),
       ),
     ],
     errorBuilder: (BuildContext context, GoRouterState state) {
@@ -68,20 +103,23 @@ class AppRoutes {
     if (path.startsWith(profile)) return 'Hồ sơ';
     if (path.startsWith(settings)) return 'Settings';
     if (path.startsWith(detail)) return 'Detail';
+    if (path.startsWith(detailStepBase)) return 'Nấu từng bước';
     if (path.startsWith(notification)) return 'Notifications';
     return 'Recipe App';
   }
 
   static String _subtitleFromLocation(String path) {
-    if (path.startsWith(home)) return 'Chao mung ban quay tro lai';
-    if (path.startsWith(search)) return 'Tim kiem nhanh nguyen lieu va mon an';
-    if (path.startsWith(recipe)) return 'Tim thay 6 cong thuc phu hop';
-    if (path.startsWith(favorites))
-      return 'Tro chuyen va nhan goi y thong minh';
-    if (path.startsWith(profile)) return 'Quan ly thong tin ca nhan cua ban';
-    if (path.startsWith(settings)) return 'Tuy chinh ung dung theo nhu cau';
-    if (path.startsWith(detail)) return 'Thong tin chi tiet mon an';
-    if (path.startsWith(notification)) return 'Cap nhat thong bao moi nhat';
-    return 'Ung dung nau an';
+    if (path.startsWith(home)) return 'Chào mừng bạn trở lại';
+    if (path.startsWith(search)) return 'Tìm kiếm nhanh nguyên liệu và món ăn';
+    if (path.startsWith(recipe)) return 'Tìm thấy 6 công thức phù hợp';
+    if (path.startsWith(favorites)) {
+      return 'Trò chuyện và nhận gợi ý thông minh';
+    }
+    if (path.startsWith(profile)) return 'Quản lý thông tin cá nhân của bạn';
+    if (path.startsWith(settings)) return 'Tùy chỉnh ứng dụng theo nhu cầu';
+    if (path.startsWith(detail)) return 'Thông tin chi tiết món ăn';
+    if (path.startsWith(detailStepBase)) return 'Làm theo hướng dẫn mỗi bước';
+    if (path.startsWith(notification)) return 'Cập nhật thông báo mới nhất';
+    return 'Ứng dụng nấu ăn';
   }
 }

@@ -7,3 +7,5 @@ export 'search_screen.dart';
 export 'favorites_screen.dart';
 export 'notification_screen.dart';
 export 'recipe_screen.dart';
+export 'detail_recipe_screen.dart';
+export 'detail_step_screen.dart';
