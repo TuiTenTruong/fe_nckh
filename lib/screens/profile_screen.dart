@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../models/models.dart';
 import '../services/services.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -14,14 +13,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  static const String _userId = 'mobile-demo-user';
-
   bool _isLoading = true;
   final int _favoriteCount = 12;
   final int _cookedCount = 45;
   int _scanHistoryCount = 0;
-  int _pantryCount = 0;
-  int _pendingSyncCount = 0;
   String? _error;
 
   @override
@@ -37,14 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      // Run network sync in background so profile stats can appear faster.
-      ServiceDemo.triggerPantrySync(userId: _userId).catchError((Object e) {
-        debugPrint('[Profile] Background sync error: $e');
-      });
-
       int historyCount = 0;
-      List<PantryItem> pantry = <PantryItem>[];
-      int pending = 0;
       int failCount = 0;
 
       try {
@@ -54,26 +42,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         debugPrint('[Profile] History load failed: $e');
       }
 
-      try {
-        pantry = await ServiceDemo.getPantry(userId: _userId);
-      } catch (e) {
-        failCount++;
-        debugPrint('[Profile] Pantry load failed: $e');
-      }
-
-      try {
-        pending = await ServiceDemo.getPendingSyncCount();
-      } catch (e) {
-        failCount++;
-        debugPrint('[Profile] Pending queue load failed: $e');
-      }
-
       if (!mounted) return;
       setState(() {
         _scanHistoryCount = historyCount;
-        _pantryCount = pantry.length;
-        _pendingSyncCount = pending;
-        _error = failCount == 3 ? 'Khong the tai du lieu ho so.' : null;
+        _error = failCount == 1 ? 'Khong the tai du lieu ho so.' : null;
         _isLoading = false;
       });
     } catch (e) {
@@ -105,8 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _ProfileHeader(
                 favoriteCount: _favoriteCount,
                 cookedCount: _cookedCount,
-                pantryCount: _pantryCount,
-                pendingSyncCount: _pendingSyncCount,
+                scanHistoryCount: _scanHistoryCount,
               ),
               const SizedBox(height: 16),
               if (_isLoading)
@@ -126,17 +97,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       children: <Widget>[
         _ActionCard(
-          icon: Icons.kitchen_outlined,
-          title: 'Nguyên liệu của tôi',
-          subtitle: 'Bạn đang có $_pantryCount nguyên liệu trong kho',
-          onTap: () => context.push('/history-recognize?tab=pantry'),
-        ),
-        const SizedBox(height: 10),
-        _ActionCard(
           icon: Icons.history,
           title: 'Lịch sử quét nguyên liệu',
           subtitle: 'Bạn đã quét $_scanHistoryCount lần',
-          onTap: () => context.push('/history-recognize?tab=history'),
+          onTap: () => context.push('/history-recognize'),
         ),
         const SizedBox(height: 10),
         _ActionCard(
@@ -154,14 +118,12 @@ class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
     required this.favoriteCount,
     required this.cookedCount,
-    required this.pantryCount,
-    required this.pendingSyncCount,
+    required this.scanHistoryCount,
   });
 
   final int favoriteCount;
   final int cookedCount;
-  final int pantryCount;
-  final int pendingSyncCount;
+  final int scanHistoryCount;
 
   @override
   Widget build(BuildContext context) {
@@ -230,25 +192,6 @@ class _ProfileHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          if (pendingSyncCount > 0) ...<Widget>[
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0x1AFFFFFF),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                'Đang có $pendingSyncCount thay đổi chờ đồng bộ khi trực tuyến.',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
           Row(
             children: <Widget>[
               Expanded(
@@ -264,8 +207,8 @@ class _ProfileHeader extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _StatBox(
-                  label: 'Kho nguyên liệu',
-                  value: '$pantryCount',
+                  label: 'Lịch sử quét',
+                  value: '$scanHistoryCount',
                 ),
               ),
             ],

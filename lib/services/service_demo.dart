@@ -1,6 +1,5 @@
 import '../models/models.dart';
 import 'ingredient_api_service.dart';
-import 'pantry_sync_service.dart';
 import 'recipe_api_service.dart';
 import 'scan_api_service.dart';
 import 'scan_local_storage_service.dart';
@@ -53,39 +52,6 @@ class ServiceDemo {
 
   static Future<List<RecipeItem>> getRandomRecipes({int limit = 4}) {
     return RecipeApiService.getRandomRecipes(limit: limit);
-  }
-
-  static Future<PantrySaveOutcome> saveIngredientToPantry({
-    required String userId,
-    required ScanDetection detection,
-    String quantity = '1',
-  }) async {
-    return PantrySyncService.saveIngredientTwoWay(
-      userId: userId,
-      ingredientId: detection.ingredientId ?? '',
-      ingredientName: detection.ingredientName ?? detection.detectedName,
-      ingredientIcon: detection.ingredientIcon ?? '🥬',
-      quantity: quantity,
-    );
-  }
-
-  static Future<PantryDeleteOutcome> deletePantryItem({
-    required String userId,
-    required PantryItem item,
-  }) async {
-    return PantrySyncService.deletePantryItemTwoWay(userId: userId, item: item);
-  }
-
-  static Future<List<PantryItem>> getPantry({required String userId}) {
-    return PantrySyncService.getPantryWithSync(userId: userId);
-  }
-
-  static Future<void> triggerPantrySync({required String userId}) {
-    return PantrySyncService.autoSync(userId: userId);
-  }
-
-  static Future<int> getPendingSyncCount() {
-    return PantrySyncService.getPendingQueueCount();
   }
 
   static Future<List<ScanHistoryItem>> getScanHistory() {

@@ -24,7 +24,6 @@ class _ScanScreenState extends State<ScanScreen> {
       TextEditingController();
 
   bool _isScanning = false;
-  bool _isSavingPantry = false;
   String? _scanError;
   String? _scanSessionId;
   Uint8List? _capturedImageBytes;
@@ -94,60 +93,6 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
-  Future<void> _saveToPantry() async {
-    final List<ScanDetection> matchedItems = _detected
-        .where(
-          (ScanDetection item) =>
-              item.matched && (item.ingredientId?.isNotEmpty ?? false),
-        )
-        .toList();
-
-    if (matchedItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Không có nguyên liệu hợp lệ để lưu kho.'),
-        ),
-      );
-      return;
-    }
-
-    setState(() => _isSavingPantry = true);
-    try {
-      int queuedCount = 0;
-      for (final ScanDetection item in matchedItems) {
-        final PantrySaveOutcome outcome =
-            await ServiceDemo.saveIngredientToPantry(
-              userId: _demoUserId,
-              detection: item,
-              quantity: '1',
-            );
-        if (outcome.queued) {
-          queuedCount++;
-        }
-      }
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            queuedCount > 0
-                ? 'Đã lưu ${matchedItems.length} nguyên liệu. $queuedCount mục sẽ đồng bộ khi có mạng.'
-                : 'Đã lưu ${matchedItems.length} nguyên liệu vào kho.',
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Lưu kho thất bại: $e')));
-    } finally {
-      if (mounted) {
-        setState(() => _isSavingPantry = false);
-      }
-    }
-  }
-
   void _removeIngredient(int index) {
     setState(() {
       _detected = List<ScanDetection>.from(_detected)..removeAt(index);
@@ -213,9 +158,7 @@ class _ScanScreenState extends State<ScanScreen> {
           ),
           const SizedBox(height: 14),
           _ActionToolbar(
-            canSave: !_isScanning,
-            isSaving: _isSavingPantry,
-            onSave: _saveToPantry,
+            canFindRecipes: !_isScanning,
             onFindRecipes: _goFindRecipesWithIngredients,
           ),
           const SizedBox(height: 12),
@@ -477,66 +420,35 @@ class _ScanHero extends StatelessWidget {
 
 class _ActionToolbar extends StatelessWidget {
   const _ActionToolbar({
-    required this.canSave,
-    required this.isSaving,
-    required this.onSave,
+    required this.canFindRecipes,
     required this.onFindRecipes,
   });
 
-  final bool canSave;
-  final bool isSaving;
-  final Future<void> Function() onSave;
+  final bool canFindRecipes;
   final VoidCallback onFindRecipes;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: canSave && !isSaving ? onSave : null,
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, 46),
-              side: const BorderSide(color: Color(0xFF16A34A)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            icon: isSaving
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.inventory_2_outlined),
-            label: Text(
-              isSaving ? 'Đang lưu...' : 'Lưu vào kho',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-            ),
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: canFindRecipes ? onFindRecipes : null,
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(0, 46),
+          backgroundColor: const Color(0xFF22C55E),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: canSave ? onFindRecipes : null,
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(0, 46),
-              backgroundColor: const Color(0xFF22C55E),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            icon: const Icon(Icons.auto_awesome),
-            label: Text(
-              'Tìm món ăn',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
+        icon: const Icon(Icons.auto_awesome),
+        label: Text(
+          'Tìm món ăn',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -639,7 +551,7 @@ class _EmptyResultCard extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Text(
-        'Chưa có nguyên liệu nào. Hãy quét để nhận diện, sau đó lưu kho hoặc tìm món ăn.',
+        'Chưa có nguyên liệu nào. Hãy quét hoặc thêm tay để bắt đầu tìm món ăn.',
         style: GoogleFonts.inter(color: const Color(0xFF475569), fontSize: 13),
       ),
     );

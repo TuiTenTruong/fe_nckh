@@ -14,8 +14,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const String _demoUserId = 'mobile-demo-user';
-
   bool _loading = true;
   String? _ingredientError;
 
@@ -61,8 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _bootstrap() async {
-    // Trigger sync in background to keep initial UI responsive.
-    ServiceDemo.triggerPantrySync(userId: _demoUserId);
     await _loadHomeData();
   }
 

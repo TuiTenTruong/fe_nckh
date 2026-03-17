@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/widgets.dart';
 
 class DetailScreen extends StatefulWidget {
-  const DetailScreen({Key? key}) : super(key: key);
+  const DetailScreen({super.key});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -6,31 +6,21 @@ import '../models/models.dart';
 import '../services/services.dart';
 
 class HistoryRecognizeScreen extends StatefulWidget {
-  const HistoryRecognizeScreen({
-    super.key,
-    this.initialTab = HistoryTab.pantry,
-  });
-
-  final HistoryTab initialTab;
+  const HistoryRecognizeScreen({super.key});
 
   @override
   State<HistoryRecognizeScreen> createState() => _HistoryRecognizeScreenState();
 }
 
 class _HistoryRecognizeScreenState extends State<HistoryRecognizeScreen> {
-  static const String _userId = 'mobile-demo-user';
-
   bool _isLoading = true;
   String? _error;
-  late HistoryTab _selectedTab;
   HistoryTimeFilter _timeFilter = HistoryTimeFilter.all;
-  List<PantryItem> _pantryItems = <PantryItem>[];
   List<ScanHistoryItem> _scanHistory = <ScanHistoryItem>[];
 
   @override
   void initState() {
     super.initState();
-    _selectedTab = widget.initialTab;
     _loadData();
   }
 
@@ -41,15 +31,10 @@ class _HistoryRecognizeScreenState extends State<HistoryRecognizeScreen> {
     });
 
     try {
-      await ServiceDemo.triggerPantrySync(userId: _userId);
-      final List<PantryItem> pantry = await ServiceDemo.getPantry(
-        userId: _userId,
-      );
       final List<ScanHistoryItem> history = await ServiceDemo.getScanHistory();
 
       if (!mounted) return;
       setState(() {
-        _pantryItems = pantry;
         _scanHistory = history;
         _isLoading = false;
       });
@@ -59,25 +44,6 @@ class _HistoryRecognizeScreenState extends State<HistoryRecognizeScreen> {
         _isLoading = false;
         _error = e.toString();
       });
-    }
-  }
-
-  Future<void> _removePantryItem(PantryItem item) async {
-    try {
-      final PantryDeleteOutcome outcome = await ServiceDemo.deletePantryItem(
-        userId: _userId,
-        item: item,
-      );
-      await _loadData();
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(outcome.message)));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Xóa thất bại: $e')));
     }
   }
 
@@ -128,7 +94,7 @@ class _HistoryRecognizeScreenState extends State<HistoryRecognizeScreen> {
               ),
             ),
             Text(
-              'Quản lý kho và lịch sử quét nguyên liệu',
+              'Theo dõi các phiên quét nguyên liệu',
               style: GoogleFonts.inter(
                 color: Colors.white.withValues(alpha: 0.9),
                 fontSize: 11,
@@ -153,27 +119,12 @@ class _HistoryRecognizeScreenState extends State<HistoryRecognizeScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
               children: <Widget>[
-                _HistorySummary(
-                  selectedTab: _selectedTab,
-                  pantryCount: _pantryItems.length,
-                  historyCount: _scanHistory.length,
-                  onTabChanged: (HistoryTab tab) {
-                    setState(() {
-                      _selectedTab = tab;
-                    });
-                  },
-                ),
+                _HistorySummary(historyCount: _scanHistory.length),
                 const SizedBox(height: 14),
                 if (_isLoading)
                   const _HistoryLoadingSkeleton()
                 else if (_error != null)
                   _ErrorCard(message: _error!, onRetry: _loadData)
-                else if (_selectedTab == HistoryTab.pantry)
-                  _PantryView(
-                    items: _pantryItems,
-                    onAddTap: () => context.go('/search'),
-                    onDeleteTap: _removePantryItem,
-                  )
                 else
                   _HistoryView(
                     items: _filteredHistory,
@@ -186,56 +137,26 @@ class _HistoryRecognizeScreenState extends State<HistoryRecognizeScreen> {
                     onScanMore: () => context.go('/search'),
                   ),
                 const SizedBox(height: 14),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () => context.go('/recipe'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF22C55E),
-                          minimumSize: const Size(0, 48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        icon: const Icon(Icons.auto_awesome),
-                        label: Text(
-                          'Tìm công thức',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => context.go('/search'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF22C55E),
+                      minimumSize: const Size(0, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => context.go('/search'),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(
-                            color: Color(0xFF22C55E),
-                            width: 1.4,
-                          ),
-                          minimumSize: const Size(0, 48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.qr_code_scanner,
-                          color: Color(0xFF22C55E),
-                        ),
-                        label: Text(
-                          'Quét thêm',
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFF22C55E),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: Text(
+                      'Quét thêm',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -246,22 +167,12 @@ class _HistoryRecognizeScreenState extends State<HistoryRecognizeScreen> {
   }
 }
 
-enum HistoryTab { pantry, history }
-
 enum HistoryTimeFilter { all, today, thisWeek, thisMonth }
 
 class _HistorySummary extends StatelessWidget {
-  const _HistorySummary({
-    required this.selectedTab,
-    required this.pantryCount,
-    required this.historyCount,
-    required this.onTabChanged,
-  });
+  const _HistorySummary({required this.historyCount});
 
-  final HistoryTab selectedTab;
-  final int pantryCount;
   final int historyCount;
-  final void Function(HistoryTab) onTabChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -279,172 +190,22 @@ class _HistorySummary extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: Row(
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              _StatPill(title: 'Kho', value: '$pantryCount'),
-              const SizedBox(width: 8),
-              _StatPill(title: 'Lịch sử', value: '$historyCount'),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: _SegmentTab(
-                    title: 'Kho nguyên liệu',
-                    selected: selectedTab == HistoryTab.pantry,
-                    onTap: () => onTabChanged(HistoryTab.pantry),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: _SegmentTab(
-                    title: 'Lịch sử quét',
-                    selected: selectedTab == HistoryTab.history,
-                    onTap: () => onTabChanged(HistoryTab.history),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatPill extends StatelessWidget {
-  const _StatPill({required this.title, required this.value});
-
-  final String title;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: <Color>[Color(0xFF22C55E), Color(0xFF16A34A)],
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              title,
-              style: GoogleFonts.inter(
-                color: Colors.white.withValues(alpha: 0.9),
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              value,
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SegmentTab extends StatelessWidget {
-  const _SegmentTab({
-    required this.title,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String title;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: selected ? Colors.white : Colors.transparent,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Center(
+          const Icon(Icons.history, color: Color(0xFF16A34A)),
+          const SizedBox(width: 10),
+          Expanded(
             child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              'Bạn có $historyCount phiên quét được lưu cục bộ',
               style: GoogleFonts.inter(
-                color: selected
-                    ? const Color(0xFF166534)
-                    : const Color(0xFF475569),
-                fontSize: 12,
+                color: const Color(0xFF111827),
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-        ),
+        ],
       ),
-    );
-  }
-}
-
-class _PantryView extends StatelessWidget {
-  const _PantryView({
-    required this.items,
-    required this.onAddTap,
-    required this.onDeleteTap,
-  });
-
-  final List<PantryItem> items;
-  final VoidCallback onAddTap;
-  final void Function(PantryItem item) onDeleteTap;
-
-  @override
-  Widget build(BuildContext context) {
-    if (items.isEmpty) {
-      return _EmptyStateCard(
-        message:
-            'Kho nguyên liệu đang trống. Hãy quét thêm nguyên liệu để bắt đầu.',
-        buttonText: 'Mở trang quét',
-        onTap: onAddTap,
-      );
-    }
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.length + 1,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 1.35,
-      ),
-      itemBuilder: (BuildContext context, int index) {
-        if (index == items.length) {
-          return _AddIngredientCard(onTap: onAddTap);
-        }
-
-        final PantryItem item = items[index];
-        return _PantryItemCard(item: item, onDelete: () => onDeleteTap(item));
-      },
     );
   }
 }
@@ -632,131 +393,6 @@ class _HistorySessionCard extends StatelessWidget {
     final String dd = dt.day.toString().padLeft(2, '0');
     final String mo = dt.month.toString().padLeft(2, '0');
     return '$hh:$mm  $dd/$mo/${dt.year}';
-  }
-}
-
-class _PantryItemCard extends StatelessWidget {
-  const _PantryItemCard({required this.item, required this.onDelete});
-
-  final PantryItem item;
-  final VoidCallback onDelete;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Stack(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      item.ingredientIcon,
-                      style: const TextStyle(fontSize: 22),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        item.ingredientName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          color: const Color(0xFF0F172A),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        'Số lượng: ${item.quantity}',
-                        style: GoogleFonts.inter(
-                          color: const Color(0xFF64748B),
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            right: 4,
-            top: 4,
-            child: InkWell(
-              onTap: onDelete,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                width: 22,
-                height: 22,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEF4444),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.close, color: Colors.white, size: 12),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AddIngredientCard extends StatelessWidget {
-  const _AddIngredientCard({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFECFDF3),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFF22C55E)),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Icon(Icons.add_circle_outline, color: Color(0xFF22C55E)),
-              const SizedBox(height: 6),
-              Text(
-                'Thêm',
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF22C55E),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
 
