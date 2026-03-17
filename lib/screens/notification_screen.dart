@@ -14,7 +14,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       appBar: const AppHeaderBar(
         title: 'Notifications',
-        subtitle: 'Cap nhat thong bao moi nhat',
+        subtitle: 'Cập nhật thông báo mới nhất',
       ),
       body: const Center(child: Text('Notification Screen')),
     );

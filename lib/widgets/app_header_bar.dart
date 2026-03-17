@@ -15,103 +15,146 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   final String? leadingIconUrl;
 
   @override
-  Size get preferredSize => const Size.fromHeight(104);
+  Size get preferredSize => const Size.fromHeight(148);
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xFF23C35B),
+            Color(0xFF119E4B),
+            Color(0xFF0E8F42),
+          ],
+          stops: <double>[0.0, 0.55, 1.0],
+        ),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: preferredSize.height,
+        child: Stack(
+          children: <Widget>[
+            const Positioned(
+              right: -26,
+              top: -24,
+              child: _GlowBubble(size: 112, opacity: 0.16),
+            ),
+            const Positioned(
+              left: -38,
+              bottom: -54,
+              child: _GlowBubble(size: 156, opacity: 0.11),
+            ),
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(0x26FFFFFF),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: const Color(0x40FFFFFF),
+                              width: 0.7,
+                            ),
+                          ),
+                          child: Center(
+                            child: Image.network(
+                              leadingIconUrl ?? _defaultLeadingIconUrl,
+                              width: 16,
+                              height: 16,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 23,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                              height: 1.15,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0x26FFFFFF),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: const Color(0x40FFFFFF),
+                              width: 0.7,
+                            ),
+                          ),
+                          child: Text(
+                            'AI',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xE6FFFFFF),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        height: 1.42,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GlowBubble extends StatelessWidget {
+  const _GlowBubble({required this.size, required this.opacity});
+
+  final double size;
+  final double opacity;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: preferredSize.height,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[Color(0xFF16A34A), Color(0xFF15803D)],
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final bool compact = constraints.maxHeight <= 44;
-
-            return Row(
-              children: <Widget>[
-                Container(
-                  width: compact ? 34 : 38,
-                  height: compact ? 34 : 38,
-                  decoration: BoxDecoration(
-                    color: const Color(0x33FFFFFF),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      leadingIconUrl ?? 'assets/svg/app_mark.svg',
-                      width: compact ? 12 : 14,
-                      height: compact ? 12 : 14,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: compact
-                      ? Text(
-                          title,
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      : Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              title,
-                              style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              subtitle,
-                              style: GoogleFonts.inter(
-                                color: Colors.white.withValues(alpha: 0.92),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                ),
-                Container(
-                  width: compact ? 30 : 34,
-                  height: compact ? 30 : 34,
-                  decoration: BoxDecoration(
-                    color: const Color(0x33FFFFFF),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.notifications_none,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: opacity),
+        shape: BoxShape.circle,
       ),
     );
   }
