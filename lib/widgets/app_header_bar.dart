@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   const AppHeaderBar({
@@ -70,11 +69,10 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
                             ),
                           ),
                           child: Center(
-                            child: Image.network(
-                              leadingIconUrl ?? _defaultLeadingIconUrl,
-                              width: 16,
-                              height: 16,
-                              fit: BoxFit.contain,
+                            child: Icon(
+                              Icons.restaurant_menu_rounded,
+                              size: 20,
+                              color: Colors.white.withValues(alpha: 0.95),
                             ),
                           ),
                         ),
