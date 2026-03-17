@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   const AppHeaderBar({
@@ -13,79 +14,104 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   final String subtitle;
   final String? leadingIconUrl;
 
-  static const String _defaultLeadingIconUrl =
-      'https://storage.googleapis.com/codeless-app.appspot.com/uploads%2Fimages%2F0SN4w0RadPKtOcjLJ2JJ%2F987e5450-06fb-4362-9a06-e76dbbaf738c.png';
-
   @override
-  Size get preferredSize => const Size.fromHeight(132);
+  Size get preferredSize => const Size.fromHeight(104);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       height: preferredSize.height,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
       decoration: const BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
         gradient: LinearGradient(
-          colors: <Color>[Color(0xFF22C55E), Color(0xFF00A63E)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[Color(0xFF16A34A), Color(0xFF15803D)],
         ),
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: <Widget>[
-          Positioned(
-            left: 24,
-            top: 24,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0x33FFFFFF),
-                borderRadius: BorderRadius.circular(9999),
-              ),
-              child: Center(
-                child: Image.network(
-                  leadingIconUrl ?? _defaultLeadingIconUrl,
-                  width: 12,
-                  height: 12,
-                  fit: BoxFit.contain,
+      child: SafeArea(
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final bool compact = constraints.maxHeight <= 44;
+
+            return Row(
+              children: <Widget>[
+                Container(
+                  width: compact ? 34 : 38,
+                  height: compact ? 34 : 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0x33FFFFFF),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      leadingIconUrl ?? 'assets/svg/app_mark.svg',
+                      width: compact ? 12 : 14,
+                      height: compact ? 12 : 14,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 27,
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                height: 1.5,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 24,
-            right: 24,
-            top: 80,
-            child: Opacity(
-              opacity: 0.9,
-              child: Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 14,
-                  height: 1.4,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: compact
+                      ? Text(
+                          title,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              title,
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 1),
+                            Text(
+                              subtitle,
+                              style: GoogleFonts.inter(
+                                color: Colors.white.withValues(alpha: 0.92),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                 ),
-              ),
-            ),
-          ),
-        ],
+                Container(
+                  width: compact ? 30 : 34,
+                  height: compact ? 30 : 34,
+                  decoration: BoxDecoration(
+                    color: const Color(0x33FFFFFF),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.notifications_none,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

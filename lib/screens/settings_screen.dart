@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -14,7 +14,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: const AppHeaderBar(
         title: 'Settings',
-        subtitle: 'Tuy chinh ung dung theo nhu cau',
+        subtitle: 'Tùy chỉnh ứng dụng',
       ),
       body: const Center(child: Text('Settings Screen')),
     );

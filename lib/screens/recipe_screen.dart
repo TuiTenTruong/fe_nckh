@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RecipeScreen extends StatefulWidget {
-  const RecipeScreen({Key? key}) : super(key: key);
+  const RecipeScreen({super.key});
 
   @override
   State<RecipeScreen> createState() => _RecipeScreenState();
