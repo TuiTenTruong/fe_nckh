@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
@@ -113,6 +114,20 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
                               letterSpacing: 0.8,
                             ),
                           ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          tooltip: 'Cai dat',
+                          onPressed: () => context.push('/settings'),
+                          style: IconButton.styleFrom(
+                            backgroundColor: const Color(0x26FFFFFF),
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(
+                              color: Color(0x40FFFFFF),
+                              width: 0.7,
+                            ),
+                          ),
+                          icon: const Icon(Icons.settings_outlined, size: 20),
                         ),
                       ],
                     ),

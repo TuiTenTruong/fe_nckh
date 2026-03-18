@@ -78,6 +78,10 @@ class AppRoutes {
         path: notification,
         builder: (context, state) => const NotificationScreen(),
       ),
+      GoRoute(
+        path: historyRecognize,
+        builder: (context, state) => const HistoryRecognizeScreen(),
+      ),
     ],
     errorBuilder: (BuildContext context, GoRouterState state) {
       return Scaffold(

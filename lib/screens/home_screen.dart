@@ -4,7 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../models/models.dart';
+import '../routes/routes.dart';
 import '../services/services.dart';
+import '../utils/utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onTapRecipe: (RecipeItem recipe) {
             Navigator.of(context).pop();
             this.context.go(
-              '/recipe?keyword=${Uri.encodeComponent(recipe.name)}',
+              '${AppRoutes.detailRecipeBase}/${Uri.encodeComponent(recipe.id)}',
             );
           },
         );
@@ -165,7 +167,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _RecipeCard(
                       recipe: recipe,
-                      onTap: () => context.go('/recipe'),
+                      onTap: () => context.go(
+                        '${AppRoutes.detailRecipeBase}/${Uri.encodeComponent(recipe.id)}',
+                      ),
                     ),
                   ),
                 ),
@@ -188,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisCount: 4,
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
-          childAspectRatio: 0.9,
+          childAspectRatio: 0.82,
         ),
         itemBuilder: (BuildContext context, int index) =>
             const _IngredientSkeletonCard(),
@@ -241,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisCount: 4,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
-        childAspectRatio: 0.9,
+        childAspectRatio: 0.82,
       ),
       itemBuilder: (_, int index) => _IngredientCard(
         item: items[index],
@@ -416,24 +420,29 @@ class _IngredientCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0xFFE5E7EB)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text(item.icon, style: const TextStyle(fontSize: 26)),
-              const SizedBox(height: 8),
-              Text(
-                item.name,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF374151),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+              const SizedBox(height: 6),
+              Flexible(
+                child: Text(
+                  item.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF374151),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    height: 1.2,
+                  ),
                 ),
               ),
             ],
@@ -597,6 +606,11 @@ class _RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String imageUrl = RecipeImageUtils.resolveRecipeImageUrl(
+      rawUrl: recipe.imageUrl,
+      recipeName: recipe.name,
+    );
+
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(16),
@@ -611,12 +625,21 @@ class _RecipeCard extends StatelessWidget {
           child: ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: recipe.imageUrl.isNotEmpty
+              child: imageUrl.isNotEmpty
                   ? Image.network(
-                      recipe.imageUrl,
+                      imageUrl,
                       width: 58,
                       height: 58,
                       fit: BoxFit.cover,
+                      errorBuilder:
+                          (BuildContext context, Object error, StackTrace? st) {
+                            return SvgPicture.asset(
+                              'assets/svg/recipe_1.svg',
+                              width: 58,
+                              height: 58,
+                              fit: BoxFit.cover,
+                            );
+                          },
                     )
                   : SvgPicture.asset(
                       'assets/svg/recipe_1.svg',

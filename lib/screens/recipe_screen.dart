@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/models.dart';
 import '../routes/routes.dart';
 import '../services/services.dart';
+import '../utils/utils.dart';
 
 class RecipeScreen extends StatefulWidget {
   const RecipeScreen({super.key});
@@ -233,7 +234,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
   }
 
   Widget _buildRecipeCard({required Recipe recipe}) {
-    final String image = _resolveImageUrl(recipe.imageUrl);
+    final String image = RecipeImageUtils.resolveRecipeImageUrl(
+      rawUrl: recipe.imageUrl,
+      recipeName: recipe.name,
+    );
 
     return InkWell(
       borderRadius: BorderRadius.circular(24),
@@ -387,25 +391,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
         ),
       ),
     );
-  }
-
-  String _resolveImageUrl(String rawUrl) {
-    final String trimmed = rawUrl.trim();
-    if (trimmed.isEmpty) {
-      return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200';
-    }
-
-    final Uri? uri = Uri.tryParse(trimmed);
-    final bool validHttpUrl =
-        uri != null &&
-        uri.hasScheme &&
-        (uri.scheme == 'http' || uri.scheme == 'https');
-
-    if (!validHttpUrl) {
-      return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200';
-    }
-
-    return trimmed;
   }
 
   Widget _buildRecipeImage(String imageUrl) {

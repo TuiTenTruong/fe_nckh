@@ -24,7 +24,9 @@ class _ScanScreenState extends State<ScanScreen> {
       TextEditingController();
 
   bool _isScanning = false;
+  bool _isAddingManualIngredient = false;
   String? _scanError;
+  String? _manualIngredientError;
   String? _scanSessionId;
   Uint8List? _capturedImageBytes;
   List<ScanDetection> _detected = <ScanDetection>[];
@@ -99,25 +101,122 @@ class _ScanScreenState extends State<ScanScreen> {
     });
   }
 
-  void _addManualIngredient() {
+  Future<void> _addManualIngredient() async {
     final String raw = _manualIngredientController.text.trim();
     if (raw.isEmpty) {
       return;
     }
 
     setState(() {
-      _detected = <ScanDetection>[
-        ScanDetection(
-          detectedName: raw,
-          confidence: 1,
-          matched: false,
-          ingredientName: raw,
-          ingredientIcon: '🥬',
-        ),
-        ..._detected,
-      ];
-      _manualIngredientController.clear();
+      _isAddingManualIngredient = true;
+      _manualIngredientError = null;
     });
+
+    try {
+      final List<IngredientItem> candidates =
+          await ServiceDemo.searchIngredients(keyword: raw, limit: 10);
+
+      final IngredientItem? matchedIngredient = _findBestIngredientMatch(
+        query: raw,
+        candidates: candidates,
+      );
+
+      if (!mounted) return;
+
+      if (matchedIngredient == null) {
+        setState(() {
+          _isAddingManualIngredient = false;
+          _manualIngredientError =
+              'Không tìm thấy nguyên liệu trong CSDL. Vui lòng nhập tên khác.';
+        });
+        return;
+      }
+
+      final bool alreadyExists = _detected.any((ScanDetection item) {
+        if (matchedIngredient.id.isNotEmpty &&
+            item.ingredientId == matchedIngredient.id) {
+          return true;
+        }
+        final String existing = (item.ingredientName ?? item.detectedName)
+            .trim()
+            .toLowerCase();
+        return existing == matchedIngredient.name.trim().toLowerCase();
+      });
+
+      if (alreadyExists) {
+        setState(() {
+          _isAddingManualIngredient = false;
+          _manualIngredientError =
+              'Nguyên liệu này đã có trong danh sách kết quả.';
+        });
+        return;
+      }
+
+      setState(() {
+        _detected = <ScanDetection>[
+          ScanDetection(
+            detectedName: raw,
+            confidence: 1,
+            matched: true,
+            ingredientId: matchedIngredient.id,
+            ingredientName: matchedIngredient.name,
+            ingredientIcon: matchedIngredient.icon,
+            ingredientImageUrl: matchedIngredient.imageUrl,
+            ingredientCategoryName: matchedIngredient.categoryName,
+          ),
+          ..._detected,
+        ];
+        _manualIngredientController.clear();
+        _manualIngredientError = null;
+        _isAddingManualIngredient = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isAddingManualIngredient = false;
+        _manualIngredientError =
+            'Không thể tìm nguyên liệu trong CSDL. Vui lòng thử lại.';
+      });
+    }
+  }
+
+  IngredientItem? _findBestIngredientMatch({
+    required String query,
+    required List<IngredientItem> candidates,
+  }) {
+    if (candidates.isEmpty) {
+      return null;
+    }
+
+    final String normalizedQuery = _normalizeText(query);
+
+    IngredientItem? exactMatch;
+    IngredientItem? startsWithMatch;
+    IngredientItem? containsMatch;
+
+    for (final IngredientItem candidate in candidates) {
+      final String normalizedName = _normalizeText(candidate.name);
+
+      if (normalizedName == normalizedQuery) {
+        exactMatch = candidate;
+        break;
+      }
+
+      if (startsWithMatch == null &&
+          normalizedName.startsWith(normalizedQuery)) {
+        startsWithMatch = candidate;
+      }
+
+      if (containsMatch == null && normalizedName.contains(normalizedQuery)) {
+        containsMatch = candidate;
+      }
+    }
+
+    return exactMatch ?? startsWithMatch ?? containsMatch;
+  }
+
+  String _normalizeText(String input) {
+    return input.trim().toLowerCase();
   }
 
   void _goFindRecipesWithIngredients() {
@@ -165,6 +264,8 @@ class _ScanScreenState extends State<ScanScreen> {
           _ManualIngredientCard(
             controller: _manualIngredientController,
             onAddTap: _addManualIngredient,
+            isLoading: _isAddingManualIngredient,
+            errorMessage: _manualIngredientError,
           ),
           const SizedBox(height: 14),
           if (_scanError != null)
@@ -637,10 +738,14 @@ class _ManualIngredientCard extends StatelessWidget {
   const _ManualIngredientCard({
     required this.controller,
     required this.onAddTap,
+    required this.isLoading,
+    this.errorMessage,
   });
 
   final TextEditingController controller;
-  final VoidCallback onAddTap;
+  final Future<void> Function() onAddTap;
+  final bool isLoading;
+  final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -669,7 +774,9 @@ class _ManualIngredientCard extends StatelessWidget {
                 child: TextField(
                   controller: controller,
                   textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => onAddTap(),
+                  onSubmitted: (_) {
+                    onAddTap();
+                  },
                   decoration: InputDecoration(
                     hintText: 'Ví dụ: Tôm, Cà rốt, Khoai tây...',
                     isDense: true,
@@ -684,7 +791,11 @@ class _ManualIngredientCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               FilledButton(
-                onPressed: onAddTap,
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        onAddTap();
+                      },
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFF22C55E),
                   minimumSize: const Size(0, 44),
@@ -693,7 +804,7 @@ class _ManualIngredientCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Thêm',
+                  isLoading ? 'Đang tìm...' : 'Thêm',
                   style: GoogleFonts.inter(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -702,6 +813,17 @@ class _ManualIngredientCard extends StatelessWidget {
               ),
             ],
           ),
+          if (errorMessage != null && errorMessage!.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              errorMessage!,
+              style: GoogleFonts.inter(
+                color: const Color(0xFFB91C1C),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ],
       ),
     );

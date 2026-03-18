@@ -120,4 +120,28 @@ class IngredientApiService {
         .map(IngredientItem.fromJson)
         .toList();
   }
+
+  static Future<List<IngredientItem>> searchIngredients({
+    required String keyword,
+    int limit = 10,
+  }) async {
+    final String trimmed = keyword.trim();
+    if (trimmed.isEmpty) {
+      return <IngredientItem>[];
+    }
+
+    final http.Response response = await _getWithFallback(
+      '/api/ingredients',
+      <String, String>{'search': trimmed, 'page': '1', 'per_page': '$limit'},
+    );
+
+    final Map<String, dynamic> body =
+        jsonDecode(response.body) as Map<String, dynamic>;
+    final List<dynamic> data = (body['data'] as List<dynamic>?) ?? <dynamic>[];
+
+    return data
+        .whereType<Map<String, dynamic>>()
+        .map(IngredientItem.fromJson)
+        .toList();
+  }
 }

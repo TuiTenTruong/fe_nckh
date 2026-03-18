@@ -1,17 +1,54 @@
-# fe
+# FE NCKH (Flutter App)
 
-A new Flutter project.
+Ung dung Flutter cho phep tim cong thuc, quet nguyen lieu, xem chi tiet mon an va luu pantry.
 
-## Getting Started
+## 1) Yeu cau moi truong
 
-This project is a starting point for a Flutter application.
+- Flutter SDK phu hop voi Dart `^3.11.1`
+- Android Studio hoac VS Code + Flutter extension
+- Android emulator hoac thiet bi that
 
-A few resources to get you started if this is your first Flutter project:
+## 2) Cai dat
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+cd fe_nckh
+flutter pub get
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 3) Ket noi backend local
+
+Backend mac dinh chay o `http://127.0.0.1:5000`.
+
+Neu chay tren Android emulator, can map cong:
+
+```bash
+adb reverse tcp:5000 tcp:5000
+```
+
+## 4) Chay app
+
+```bash
+cd fe_nckh
+flutter run --dart-define API_BASE_URL=http://127.0.0.1:5000
+```
+
+Neu khong truyen `--dart-define`, app se dung base URL mac dinh trong code.
+
+## 5) Build release (tuy chon)
+
+```bash
+flutter build apk --dart-define API_BASE_URL=http://127.0.0.1:5000
+```
+
+## 6) Cac man hinh chinh
+
+- Home: goi y nguyen lieu + cong thuc
+- Scan: quet anh de nhan dang nguyen lieu
+- Recipe: danh sach cong thuc va loc theo keyword/nguyen lieu
+- Detail Recipe: thong tin chi tiet mon an + step nau
+
+## 7) Thu muc quan trong
+
+- [fe_nckh/lib/screens](fe_nckh/lib/screens): man hinh UI
+- [fe_nckh/lib/services](fe_nckh/lib/services): API service
+- [fe_nckh/lib/routes/routes.dart](fe_nckh/lib/routes/routes.dart): dinh tuyen GoRouter

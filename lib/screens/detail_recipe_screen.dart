@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/models.dart';
 import '../routes/routes.dart';
 import '../services/services.dart';
+import '../utils/utils.dart';
 import '../widgets/widgets.dart';
 
 class DetailRecipeScreen extends StatefulWidget {
@@ -103,7 +104,7 @@ class _DetailRecipeScreenState extends State<DetailRecipeScreen> {
                 background: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
-                    _buildImage(recipe.imageUrl),
+                    _buildImage(recipe.imageUrl, recipe.name),
                     Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
@@ -461,13 +462,11 @@ class _DetailRecipeScreenState extends State<DetailRecipeScreen> {
     );
   }
 
-  Widget _buildImage(String rawUrl) {
-    final String fallback =
-        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200';
-    final String url =
-        (rawUrl.trim().isNotEmpty && (Uri.tryParse(rawUrl)?.hasScheme ?? false))
-        ? rawUrl
-        : fallback;
+  Widget _buildImage(String rawUrl, String recipeName) {
+    final String url = RecipeImageUtils.resolveRecipeImageUrl(
+      rawUrl: rawUrl,
+      recipeName: recipeName,
+    );
 
     return Image.network(
       url,

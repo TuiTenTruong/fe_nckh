@@ -50,6 +50,16 @@ class ServiceDemo {
     );
   }
 
+  static Future<List<IngredientItem>> searchIngredients({
+    required String keyword,
+    int limit = 10,
+  }) {
+    return IngredientApiService.searchIngredients(
+      keyword: keyword,
+      limit: limit,
+    );
+  }
+
   static Future<List<RecipeItem>> getRandomRecipes({int limit = 4}) {
     return RecipeApiService.getRandomRecipes(limit: limit);
   }
